@@ -40,6 +40,36 @@ def scrape_all():
     data["news_title"] = first_article
     data["news_paragraph"] = news_p
 
+    # Visit the url for JPL Featured Space Image
+    url_2 = 'https://www.jpl.nasa.gov/images?search=&category=Mars'
+    browser.visit(url_2)
+
+    # Create a Beautiful Soup object
+    soup2 = bs(browser.html, 'lxml')
+
+    # Find and append the links(href) for each image featured on the page
+    article_images = soup2.find_all('a', class_="group cursor-pointer block")
+    image_links = []
+    for image in article_images:
+        image_links.append(image['href'])
+
+    # Scrape through the first href and find the full sized image url
+    soup2 = bs(browser.html, 'lxml')
+
+    domain_url = 'https://' + browser.url.replace('http://','').replace('https://','').split('/', 1)[0]
+
+    browser.visit(domain_url + image_links[0]) 
+    soup3 = bs(browser.html, 'lxml')
+    img_url = soup3.find_all('div', class_ = "lg:w-auto w-full")
+    img_href = []
+    for i in img_url:
+        if (i.a):
+            if (i.a['href']):
+                img_href.append(i.a['href'])
+                
+    featured_image_url = img_href[0]
+
+    data["featured_image"] = featured_image_url
 
     browser.quit()
 
