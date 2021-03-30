@@ -71,6 +71,22 @@ def scrape_all():
 
     data["featured_image"] = featured_image_url
 
+    # Visit the Mars Facts webpage
+    url_3 = 'https://space-facts.com/mars/'
+    browser.visit(url_3)
+
+    # Create a Beautiful Soup object
+    soup3 = bs(browser.html, 'lxml')
+
+    # Scrape the table containing facts about the planet including Diameter, Mass, etc.
+    mars_facts = pd.read_html(browser.html)
+    table_df = mars_facts[0]
+
+    # Use Pandas to convert the data to a HTML table string.
+
+    table_df.columns = ["description", "value"]
+    data["facts"] = table_df.to_html(index=False)
+    
     browser.quit()
 
     return data
