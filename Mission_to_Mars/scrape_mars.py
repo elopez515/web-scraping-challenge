@@ -87,6 +87,37 @@ def scrape_all():
     table_df.columns = ["description", "value"]
     data["facts"] = table_df.to_html(index=False)
     
+    # Bring in the USGS Astrogeology site for our web scrapping
+    url_4 = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url_4)
+
+    # Create a Beautiful Soup object
+    soup4 = bs(browser.html, 'lxml')
+
+    hemisphere_image_urls = []
+
+    # Run a for loop to click through our hemisphere links in order to 
+    # append the titles & urls for the full resolution hemisphere images
+    links = browser.find_by_css("a.product-item h3")
+    for item in range(len(links)):
+        hemisphere = {}
+    
+        browser.find_by_css("a.product-item h3")[item].click()
+        
+        # find urls for the full resolution hemisphere images
+        aref_list = browser.find_link_by_text("Sample").first
+        hemisphere["img_url"] = aref_list["href"]
+        
+        # find the titles for our hemisphere images
+        hemisphere["title"] = browser.find_by_css("h2.title").text
+        
+        # append titles & urls for our hemisphere images
+        hemisphere_image_urls.append(hemisphere)
+        
+        browser.back()
+  
+        data["hemispheres"] = hemisphere_image_urls
+
     browser.quit()
 
     return data
